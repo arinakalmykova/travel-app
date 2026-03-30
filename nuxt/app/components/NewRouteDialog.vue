@@ -13,8 +13,12 @@
             <v-text-field
               v-model="form.description"
               label="Описание"
-
               required
+            />
+            <v-file-input
+              label="Фото маршрута"
+              accept="image/*"
+              @change="onFileChange"
             />
           </v-form>
         </v-card-text>
@@ -29,21 +33,26 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits,watch } from "vue";
-import store from '../store/store';
+import { ref, defineProps, defineEmits, watch } from "vue";
+import store from "../store/store";
 
 const props = defineProps({
-  modelValue: Boolean
+  modelValue: Boolean,
 });
 
 const emit = defineEmits(["update:modelValue", "saved"]);
 
 const showDialog = ref(props.modelValue);
-const form = ref({ title: "", description: "" });
+const form = ref({ title: "", description: ""});
+const file = ref(null);
+
+const onFileChange = (e) => {
+  file.value = e.target.files[0];
+};
 
 watch(
   () => props.modelValue,
-  (val) => (showDialog.value = val)
+  (val) => (showDialog.value = val),
 );
 watch(showDialog, (val) => emit("update:modelValue", val));
 
@@ -52,14 +61,22 @@ const closeDialog = () => {
 };
 
 const submitForm = async () => {
+  const formData = new FormData();
   if (!form.value.title || !form.value.description) {
     alert("Заполните все поля");
     return;
   }
 
+  formData.append("title", form.value.title);
+  formData.append("description", form.value.description);
+
+  if (file.value) {
+    formData.append("image", file.value);
+  }
+
   try {
-    await store.dispatch('createRoute',form.value);
-    emit("saved"); 
+    await store.dispatch("createRoute", formData);
+    emit("saved");
     form.value.title = "";
     form.value.description = "";
     closeDialog();

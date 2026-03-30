@@ -1,8 +1,8 @@
 <template>
-    <div class="logo">
+    <NuxtLink to="/" class="logo">
         <v-icon icon="mdi-earth"></v-icon>
         <span class="logo-text">Travel Planner</span>
-    </div>
+    </NuxtLink>
 </template>
 
 <style scoped lang="scss">

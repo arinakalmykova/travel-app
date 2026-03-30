@@ -4,7 +4,7 @@
     <SearchBar v-model="searchQuery" />
     <div class="routes-block">
       <template v-if="routes.length > 0">
-        <RouteList :routes="routes"/>
+        <RouteList :routes="filtredRoutes"/>
       </template>
       <template v-else>
         <p>У вас пока нет маршрутов</p>
@@ -19,22 +19,27 @@
 </template>
 
 <script setup>
-import {ref,computed,onMounted} from "vue";
-import store from '../store/store';
+  import {ref,computed,onMounted} from "vue";
+  import store from '../store/store';
 
-const showDialog = ref(false);
-const searchQuery = ref('');
+  const showDialog = ref(false);
+  const searchQuery = ref('');
 
-onMounted(async() => {
-  if(!store.state.routes.length){
+  onMounted(async() => {
+    if(!store.state.routes.length){
+      await store.dispatch('fetchRoutes');
+    }
+  });
+
+  const routes = computed(() => store.state.routes);
+  const refresh = async () => {
     await store.dispatch('fetchRoutes');
-  }
-});
+  };
 
-const routes = computed(() => store.state.routes);
-const refresh = async () => {
-  await store.dispatch('fetchRoutes');
-};
+  const filtredRoutes = computed(() => {
+    return routes.value.filter(route => 
+      route.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
+  });
 </script>
 
 <style scoped lang="scss">
