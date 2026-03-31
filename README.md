@@ -14,7 +14,8 @@
 - SCSS
 - Vitest
 - Vue Test Utils
-
+- Node.js
+- Express
 ---
 
 ## ✨ Функционал
